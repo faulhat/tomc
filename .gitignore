@@ -32,3 +32,4 @@
 *.app
 
 target/
+src/antlr4/.antlr/
