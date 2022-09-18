@@ -2,7 +2,7 @@ grammar CProgram;
 
 // Without the EOF, extraneous invalid input may be ignored.
 program
-    : statement* EOF
+    : (preproc | statement)* EOF
     ;
 
 // Preprocessor directives
@@ -11,12 +11,16 @@ program
 preproc
     : '#define' Name ENDL #DefineFlag
     | '#define' Name expression ENDL #DefineConst
-    | '#define' Name '(' ( ( Name ',' )* Name )? ')' expression ENDL #DefineMacro
+    | '#define' Name macroArgList expression ENDL #DefineMacro
     | '#ifdef' Name ENDL #IfDef
     | '#ifndef' Name ENDL #IfNotDef
     | '#undef' Name ENDL #UnDef
     | '#endif' ENDL #EndIf
     | '#include' String ENDL #IncludeFile
+    ;
+
+macroArgList
+    : '(' ( ( Name ',' )* Name )? ')'
     ;
 
 statement
