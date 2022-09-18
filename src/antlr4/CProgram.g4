@@ -1,9 +1,13 @@
 grammar CProgram;
 
+// Without the EOF, extraneous invalid input may be ignored.
 program
     : statement* EOF
     ;
 
+// Preprocessor directives
+// Some expressions are valid in preprocessing but not in actual code.
+// TODO: These errors should be detected semantically.
 preproc
     : '#define' Name ENDL #DefineFlag
     | '#define' Name expression ENDL #DefineConst
@@ -28,10 +32,13 @@ statement
     | whileLoop
     ;
 
+// else-if clauses will be parsed as an else-clause with an if-statement as its predicate.
+ifElse
+    : ifStmt 'else' statement
+    ;
+
 ifStmt
-    : 'if' '(' expression ')' statement #BaseIf
-    | 'else' 'if' '(' expression ')' statement #ElseIf
-    | 'else' statement #ElseClause
+    : 'if' '(' expression ')' statement
     ;
 
 forLoop
@@ -46,11 +53,14 @@ declaration
     : type varName
     ;
 
+// A variable name to be used in a declaration.
+// Note that the brackets in an array declaration can come after the type or the varname.
 varName
     : Name
     | varName '[' ']'
     ;
 
+// A comma-separated list of variable declarations and/or definitions
 deflist
     : declaration #SingleDecl
     | declaration ASSIGN expression #SingleDef
@@ -66,18 +76,22 @@ fnImplementation
     : declaration argDeclList block
     ;
 
+// A type alias definition
 typeDefinition
     : 'typedef' type Name ';'
     ;
 
+// A list of argument declarations for a function
 argDeclList
     : '(' ( ( ( declaration | type ) ',' )* ( declaration | type ) )? ')'
     ;
 
+// A bracketed list of statements to be executed with its own scope
 block
     : '{' statement* '}'
     ;
 
+// Any expression which can be evaluated
 expression
     : expression op=( INC | DEC ) #SuffixOp
     | expression arglist #Call
@@ -112,14 +126,17 @@ expression
     | TokenConcat #ConcatTokensSpecial
     ;
 
+// A parenthesized list of expressions to be passed as arguments to a function
 arglist
     : '(' ( ( expression ',' )* expression )? ')'
     ;
 
+// An initializer list for an array or struct
 initlist
     : '{' ( ( expression ',' )* expression )? '}'
     ;
 
+// Any type identifier
 type
     : Name #SimpleType
     | type '[' ']' #ArrayType
@@ -131,10 +148,12 @@ type
     | '(' STAR type ')' typelist #FnPtrType
     ;
 
+// A parenthesized, comma-separated list of types
 typelist
     : '(' ( ( type ',' )* type )? ')'
     ;
 
+// A list of data members in a complex type
 structlist
     : '{' ( type Name ';' )* '}'
     ;

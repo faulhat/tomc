@@ -33,3 +33,5 @@
 
 target/
 src/antlr4/.antlr/
+grammar/
+.vscode/
