@@ -1,4 +1,12 @@
+#include <vector>
 #include "DOTListener.hpp"
+
+const string &DOTListener::getName()
+{
+    stringstream name;
+    name << "n" << this->nameNumber++;
+    return name.str();
+}
 
 void DOTListener::addStatement(const string &statement)
 {
@@ -53,20 +61,18 @@ void DOTListener::pop()
     return nodeTraceback.pop();
 }
 
-const stringstream &DOTListener::getOutput() const
+const string &DOTListener::getOutput() const
 {
-    return output;
+    return output.str();
 }
 
 DOTListener::DOTListener()
     : nameNumber(0)
 {}
 
-string DOTListener::getName()
+void DOTListener::visitTerminal(tree::TerminalNode *node)
 {
-    stringstream stream;
-    stream << "n" << ++this->nameNumber;
-    return stream.str();
+    addAttachNextTerm(node->getText(), Shape::Blob);
 }
 
 void DOTListener::enterProgram(CProgramParser::ProgramContext *ctx)
@@ -80,6 +86,8 @@ void DOTListener::exitProgram(CProgramParser::ProgramContext *ctx)
 {
     output << "}";
     nodeTraceback.pop();
+
+    // If all has gone correctly, the root node was just popped from the stack.
     assert(nodeTraceback.empty());
 }
 
@@ -138,18 +146,14 @@ void DOTListener::enterIncludeFile(CProgramParser::IncludeFileContext *ctx)
 
 void DOTListener::enterMacroArgList(CProgramParser::MacroArgListContext *ctx)
 {
-    auto args = ctx->Name();
     addAttachPushNext("Macro args", Shape::Box);
-    for (tree::TerminalNode *arg : args) {
-        addAttachNextTerm(arg->getText(), Shape::Blob);
-    }
-
-    pop();
 }
+
+void DOTListener::exitMacroArgList(CProgramParser::MacroArgListContext *ctx) { pop(); }
 
 void DOTListener::enterStatement(CProgramParser::StatementContext *ctx)
 {
-    addAttachPushNext("Statement", Shape::Box);
+    addAttachPushNext("S", Shape::Box);
 }
 
 void DOTListener::exitStatement(CProgramParser::StatementContext *ctx) { pop(); }
@@ -161,13 +165,29 @@ void DOTListener::enterElseStmt(CProgramParser::ElseStmtContext *ctx) {
 void DOTListener::exitElseStmt(CProgramParser::ElseStmtContext *ctx) { pop(); }
 
 void DOTListener::enterIfStmt(CProgramParser::IfStmtContext *ctx) {
-    addAttachPushNext("If (cond) pred", Shape::Box);
+    addAttachPushNext("If", Shape::Box);
 }
 
 void DOTListener::exitIfStmt(CProgramParser::IfStmtContext *ctx) { pop(); }
 
 void DOTListener::enterForLoop(CProgramParser::ForLoopContext *ctx) {
-    addAttachPushNext("For (;;)", Shape::Box);
+    addAttachPushNext("For", Shape::Box);
 }
 
 void DOTListener::exitForLoop(CProgramParser::ForLoopContext *ctx) { pop(); }
+
+void DOTListener::enterWhileLoop(CProgramParser::WhileLoopContext *ctx) {
+    addAttachPushNext("While", Shape::Box);
+}
+
+void DOTListener::exitWhileLoop(CProgramParser::WhileLoopContext *ctx) { pop(); }
+
+void DOTListener::enterDeclaration(CProgramParser::DeclarationContext *ctx) {
+    addAttachPushNext("Declaration", Shape::Box);
+}
+
+void DOTListener::exitDeclaration(CProgramParser::DeclarationContext *ctx) { pop(); }
+
+void DOTListener::enterVarName(CProgramParser::VarNameContext *ctx) {
+    addAttachNextTerm(ctx->getText(), Shape::Box);
+}
