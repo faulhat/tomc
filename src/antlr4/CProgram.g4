@@ -1,8 +1,12 @@
 grammar CProgram;
 
-// Without the EOF, extraneous invalid input may be ignored.
 program
-    : (preproc | statement)* EOF
+    : stmtList EOF
+    ;
+
+// Without the EOF, extraneous invalid input may be ignored.
+stmtList
+    : ( preproc | statement )*
     ;
 
 // Preprocessor directives
@@ -12,10 +16,9 @@ preproc
     : '#define' Name ENDL #DefineFlag
     | '#define' Name expression ENDL #DefineConst
     | '#define' Name macroArgList expression ENDL #DefineMacro
-    | '#ifdef' Name ENDL #IfDef
-    | '#ifndef' Name ENDL #IfNotDef
+    | '#ifdef' Name ENDL stmtList '#endif' ENDL #IfDef
+    | '#ifndef' Name ENDL stmtList '#endif' ENDL #IfNotDef
     | '#undef' Name ENDL #UnDef
-    | '#endif' ENDL #EndIf
     | '#include' String ENDL #IncludeFile
     ;
 
@@ -36,13 +39,13 @@ statement
     | whileLoop
     ;
 
-// else-if clauses will be parsed as an else-clause with an if-statement as its predicate.
-ifElse
-    : ifStmt 'else' statement
+ifStmt
+    : 'if' '(' expression ')' statement elseStmt?
     ;
 
-ifStmt
-    : 'if' '(' expression ')' statement
+// an else-if clause will be parsed as an else-clause with an if-statement as its predicate.
+elseStmt
+    : 'else' statement
     ;
 
 forLoop
@@ -148,7 +151,7 @@ type
     | CONST type #ConstType
     | type CONST #ConstType
     | kind=( STRUCT | UNION ) Name? structlist #ComplexType
-    | kind=( STRUCT | UNION ) Name #UndefType
+    | kind=( STRUCT | UNION ) Name #AnonType
     | '(' STAR type ')' typelist #FnPtrType
     ;
 
