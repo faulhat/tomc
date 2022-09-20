@@ -31,7 +31,13 @@
 *.out
 *.app
 
-target/
-src/antlr4/.antlr/
-grammar/
-.vscode/
+bin/
+.antlr/
+antlrOut/
+
+# CMake
+cmake_install.cmake
+CMakeCache.txt
+CMakeFiles/
+antlr4_runtime/
+Makefile

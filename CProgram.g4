@@ -27,16 +27,17 @@ macroArgList
     ;
 
 statement
-    : ';'
-    | expression ';'
-    | deflist ';'
-    | fnDeclaration
-    | fnImplementation
-    | typeDefinition
-    | block
-    | ifStmt
-    | forLoop
-    | whileLoop
+    : ';' #Empty
+    | expression ';' #EvalExpr
+    | 'return' expression ';' #ReturnExpr
+    | deflist ';' #NewVars
+    | fnDeclaration #StFnDecl
+    | fnImplementation #StFnImpl
+    | typeDefinition #StType
+    | block #StBlock
+    | ifStmt #StIf
+    | forLoop #StFor
+    | whileLoop #StWhile
     ;
 
 ifStmt

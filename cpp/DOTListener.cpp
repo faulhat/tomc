@@ -9,17 +9,15 @@
         addAttachPushNext(LABEL); \
     } \
     \
-    void DOTListener::exit##NAME (CProgramParser::NAME##Context *ctx) { pop(); } \
-
+    void DOTListener::exit##NAME (CProgramParser::NAME##Context *ctx) { pop(); }
 
 // The same thing but for terminal nodes
 #define NODE_GEN_TERM(NAME, EXPR) \
     void DOTListener::enter##NAME (CProgramParser::NAME##Context *ctx) { \
         addAttachNextTerm(EXPR); \
-    } \
+    }
 
-
-const string &DOTListener::getName()
+string DOTListener::getName()
 {
     stringstream name;
     name << "n" << this->nameNumber++;
@@ -79,7 +77,7 @@ void DOTListener::pop()
     return nodeTraceback.pop();
 }
 
-const string &DOTListener::getOutput() const
+string DOTListener::getOutput() const
 {
     return output.str();
 }
@@ -102,7 +100,7 @@ void DOTListener::enterProgram(CProgramParser::ProgramContext *ctx)
 
 void DOTListener::exitProgram(CProgramParser::ProgramContext *ctx)
 {
-    output << "}";
+    output << "}\n";
     nodeTraceback.pop();
 
     // If all has gone correctly, the root node was just popped from the stack.
@@ -132,7 +130,7 @@ void DOTListener::enterDefineMacro(CProgramParser::DefineMacroContext *ctx)
     addAttachPushNext(label.str(), Shape::Box);
 }
 
-void DOTListener::enterDefineMacro(CProgramParser::DefineMacroContext *ctx) { pop(); }
+void DOTListener::exitDefineMacro(CProgramParser::DefineMacroContext *ctx) { pop(); }
 
 void DOTListener::enterIfDef(CProgramParser::IfDefContext *ctx)
 {
@@ -163,7 +161,8 @@ void DOTListener::enterIncludeFile(CProgramParser::IncludeFileContext *ctx)
 }
 
 NODE_GEN_NONTERM(MacroArgList, "ARGS")
-NODE_GEN_NONTERM(Statement, "S")
+NODE_GEN_NONTERM(EvalExpr, "S")
+NODE_GEN_NONTERM(ReturnExpr, "RETURN")
 NODE_GEN_NONTERM(ElseStmt, "ELSE")
 NODE_GEN_NONTERM(IfStmt, "IF")
 NODE_GEN_NONTERM(ForLoop, "FOR")

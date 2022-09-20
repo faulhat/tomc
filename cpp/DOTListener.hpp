@@ -4,23 +4,20 @@
 #include <stack>
 #include <string>
 #include <sstream>
-#include <antlr4-runtime/ParserRuleContext.h>
-#include "../../grammar/CProgramBaseListener.h"
-#include "../../grammar/CProgramParser.h"
+#include "../antlrOut/CProgramBaseListener.h"
+#include "../antlrOut/CProgramParser.h"
 
 using namespace std;
 using namespace antlr4;
 
 // Creates a declaration for the enter method for a given node type in the AST
 #define ENTER(NAME) \
-    void enter##NAME (CProgramParser::NAME##Context *ctx) override; \
-
+    void enter##NAME (CProgramParser::NAME##Context *ctx) override;
 
 // Creates a declaration for the exit method as well
 #define ENTER_EXIT(NAME) \
-    void enter##NAME (CProgramParser::NAME##Context *ctx) override; \
-    void exit##NAME (CProgramParser::NAME##Context *ctx) override; \
-
+    ENTER(NAME) \
+    void exit##NAME (CProgramParser::NAME##Context *ctx) override;
 
 // Generally, the Box shape should be used for special constructions.
 // Atoms and variable, function, and type names should use the Blob shape.
@@ -33,7 +30,7 @@ class DOTListener : public CProgramBaseListener
 {
 private:
     // Traces back up the tree
-    stack<const string &> nodeTraceback;
+    stack<string> nodeTraceback;
 
     // The output stream. This cannot be determined by the user.
     stringstream output;
@@ -42,7 +39,7 @@ private:
     int nameNumber;
 
     // Returns a string for a new name, and increments nameNumber
-    const string &getName();
+    string getName();
 
     // Adds a complete statement to the DOT output
     void addStatement(const string &statement);
@@ -77,7 +74,7 @@ private:
 public:
     // Allows retrieval of output
     // This is const in case a const instance of this class gets passed for ownership reasons.
-    const string &getOutput() const;
+    string getOutput() const;
 
     DOTListener();
 
@@ -93,7 +90,8 @@ public:
     ENTER(UnDef)
     ENTER(IncludeFile)
     ENTER_EXIT(MacroArgList)
-    ENTER_EXIT(Statement)
+    ENTER_EXIT(EvalExpr)
+    ENTER_EXIT(ReturnExpr)
     ENTER_EXIT(ElseStmt)
     ENTER_EXIT(IfStmt)
     ENTER_EXIT(ForLoop)
