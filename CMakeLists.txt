@@ -32,18 +32,23 @@ set(ANTLR_EXECUTABLE thirdparty/antlr4/antlr-4.9.3-complete.jar)
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
-# Call macro to add lexer and grammar to your build dependencies.
-antlr_target(CProgramParser CProgram.g4
-             LEXER
-             PARSER
-             LISTENER
+antlr_target(CProgramLexer CProgramLexer.g4 LEXER
              OUTPUT_DIRECTORY antlrOut)
 
+# Call macro to add lexer and grammar to your build dependencies.
+antlr_target(CProgramParser CProgramParser.g4 PARSER
+             OUTPUT_DIRECTORY antlrOut
+             DEPENDS_ANTLR CProgramLexer
+             LISTENER
+             COMPILE_FLAGS -lib ${ANTLR_CProgramLexer_OUTPUT_DIR})
+
 # include generated files in project environment
+include_directories(${ANTLR_CProgramLexer_OUTPUT_DIR})
 include_directories(${ANTLR_CProgramParser_OUTPUT_DIR})
 
 # add generated grammar to demo binary target
 add_executable(tomc cpp/DOTListener.cpp cpp/genGraph.cpp
+               ${ANTLR_CProgramLexer_CXX_OUTPUTS}
                ${ANTLR_CProgramParser_CXX_OUTPUTS})
                
 target_link_libraries(tomc antlr4_static)

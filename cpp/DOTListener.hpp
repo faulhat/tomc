@@ -4,7 +4,7 @@
 #include <stack>
 #include <string>
 #include <sstream>
-#include "../antlrOut/CProgramBaseListener.h"
+#include "../antlrOut/CProgramParserBaseListener.h"
 #include "../antlrOut/CProgramParser.h"
 
 using namespace std;
@@ -26,7 +26,7 @@ enum class Shape {
     Blob, // Graphviz default
 };
 
-class DOTListener : public CProgramBaseListener
+class DOTListener : public CProgramParserBaseListener
 {
 private:
     // Traces back up the tree
