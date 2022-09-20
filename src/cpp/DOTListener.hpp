@@ -85,54 +85,55 @@ public:
     void visitTerminal(tree::TerminalNode *node) override;
 
     ENTER_EXIT(Program)
-
     ENTER(DefineFlag)
-
     ENTER_EXIT(DefineConst)
-
     ENTER_EXIT(DefineMacro)
-
     ENTER(IfDef)
-
     ENTER(IfNotDef)
-
     ENTER(UnDef)
-
     ENTER(IncludeFile)
-
     ENTER_EXIT(MacroArgList)
-
     ENTER_EXIT(Statement)
-
     ENTER_EXIT(ElseStmt)
-
     ENTER_EXIT(IfStmt)
-
     ENTER_EXIT(ForLoop)
-
     ENTER_EXIT(WhileLoop)
-
     ENTER_EXIT(Declaration)
-
     ENTER(SimpleName)
-
     ENTER_EXIT(ArrName)
-
     ENTER_EXIT(SingleDef)
-
     ENTER_EXIT(MultDecl)
-
     ENTER_EXIT(MultDef)
-
     ENTER_EXIT(FnDeclaration)
-
     ENTER_EXIT(FnImplementation)
-
     ENTER_EXIT(TypeDefinition)
-
     ENTER_EXIT(ArgDeclList)
-
     ENTER_EXIT(Block)
+    ENTER_EXIT(SuffixOp)
+    ENTER_EXIT(Call)
+    ENTER_EXIT(Subscript)
+    ENTER_EXIT(MemberGet)
+    ENTER_EXIT(CompLiteral)
+    ENTER_EXIT(PrefixOp)
+    ENTER_EXIT(CCast)
+    ENTER_EXIT(MultOp)
+    ENTER_EXIT(AddOp)
+    ENTER_EXIT(ShiftOp)
+    ENTER_EXIT(CompareOp)
+    ENTER_EXIT(EqOp)
+    ENTER_EXIT(BitAndOp)
+    ENTER_EXIT(BitOrOp)
+    ENTER_EXIT(LojAndOp)
+    ENTER_EXIT(LojOrOp)
+    ENTER_EXIT(TernaryOp)
+    ENTER_EXIT(SetVal)
+    ENTER_EXIT(SimpleType)
+    ENTER_EXIT(ArrayType)
+    ENTER_EXIT(PtrType)
+    ENTER_EXIT(ConstType)
+    ENTER_EXIT(ComplexType)
+    ENTER_EXIT(AnonType)
+    ENTER_EXIT(FnPtrType)
 };
 
 #endif

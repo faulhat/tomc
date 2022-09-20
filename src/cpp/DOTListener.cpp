@@ -163,25 +163,15 @@ void DOTListener::enterIncludeFile(CProgramParser::IncludeFileContext *ctx)
 }
 
 NODE_GEN_NONTERM(MacroArgList, "ARGS")
-
 NODE_GEN_NONTERM(Statement, "S")
-
 NODE_GEN_NONTERM(ElseStmt, "ELSE")
-
 NODE_GEN_NONTERM(IfStmt, "IF")
-
 NODE_GEN_NONTERM(ForLoop, "FOR")
-
 NODE_GEN_NONTERM(WhileLoop, "WHILE")
-
 NODE_GEN_NONTERM(Declaration, "DECL")
-
 NODE_GEN_TERM(SimpleName, ctx->getText())
-
 NODE_GEN_NONTERM(ArrName, "[]")
-
 NODE_GEN_NONTERM(SingleDef, "=")
-
 NODE_GEN_NONTERM(MultDecl, ",")
 
 void DOTListener::enterMultDef(CProgramParser::MultDefContext *ctx) {
@@ -194,12 +184,36 @@ void DOTListener::exitMultDef(CProgramParser::MultDefContext *ctx) {
     pop();
 }
 
+#define NODE_GEN_OP(NAME) NODE_GEN_NONTERM(NAME, ctx->op->getText())
+
 NODE_GEN_NONTERM(FnDeclaration, "FN")
-
 NODE_GEN_NONTERM(FnImplementation, "FN")
-
 NODE_GEN_NONTERM(TypeDefinition, "TYPE")
-
 NODE_GEN_NONTERM(ArgDeclList, "ARGS")
-
 NODE_GEN_NONTERM(Block, "{ ... }")
+NODE_GEN_OP(SuffixOp)
+NODE_GEN_NONTERM(Call, "()")
+NODE_GEN_NONTERM(Subscript, "[]")
+NODE_GEN_OP(MemberGet)
+NODE_GEN_NONTERM(CompLiteral, "COMPLEX")
+NODE_GEN_OP(PrefixOp)
+NODE_GEN_NONTERM(CCast, "CAST")
+NODE_GEN_OP(MultOp)
+NODE_GEN_OP(AddOp)
+NODE_GEN_OP(ShiftOp)
+NODE_GEN_OP(CompareOp)
+NODE_GEN_OP(EqOp)
+NODE_GEN_NONTERM(BitAndOp, "&")
+NODE_GEN_NONTERM(BitOrOp, "|")
+NODE_GEN_NONTERM(LojAndOp, "&&")
+NODE_GEN_NONTERM(LojOrOp, "||")
+NODE_GEN_NONTERM(TernaryOp, "?:")
+NODE_GEN_OP(SetVal)
+
+NODE_GEN_NONTERM(SimpleType, "TYPE")
+NODE_GEN_NONTERM(ArrayType, "[] TYPE")
+NODE_GEN_NONTERM(PtrType, "* TYPE")
+NODE_GEN_NONTERM(ConstType, "CONST")
+NODE_GEN_NONTERM(ComplexType, ctx->kind->getText())
+NODE_GEN_NONTERM(AnonType, ctx->kind->getText())
+NODE_GEN_NONTERM(FnPtrType, "FN *")

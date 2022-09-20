@@ -104,7 +104,7 @@ expression
     | expression arglist #Call
     | expression '[' expression ']' #Subscript
     | expression op=( DOT | ARROW ) Name #MemberGet
-    | '(' type ')' arglist #CompLiteral
+    | '(' type ')' initlist #CompLiteral
 
     | op=( INC | DEC | PLUS | MINUS | LOJNOT | BITNOT | STAR | AND | SIZEOF ) expression #PrefixOp
     | '(' type ')' expression #CCast
@@ -121,7 +121,7 @@ expression
     | left=expression '||' right=expression #LojOrOp
     | cond=expression '?' ifTrue=expression ':' ifFalse=expression #TernaryOp
     | lval=expression op=( ASSIGN | INCBY | DECBY | MULTBY | DIVBY | MODBY | LSHIFTBY | RSHIFTBY | ANDBY | ORBY | XORBY )
-        rval=expression #ReAssign
+        rval=expression #SetVal
     
     | '(' expression ')' #Parenthesized
     | Name #NameAtom
