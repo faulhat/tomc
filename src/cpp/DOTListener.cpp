@@ -1,6 +1,24 @@
 #include <vector>
 #include "DOTListener.hpp"
 
+// I don't want to type these every time
+// This macro produces enter and exit method defintions for non-terminal nodes in the AST.
+// NAME is the node type and LABEL is what should go on the graph.
+#define NODE_GEN_NONTERM(NAME, LABEL) \
+    void DOTListener::enter##NAME (CProgramParser::NAME##Context *ctx) { \
+        addAttachPushNext(LABEL); \
+    } \
+    \
+    void DOTListener::exit##NAME (CProgramParser::NAME##Context *ctx) { pop(); } \
+
+
+// The same thing but for terminal nodes
+#define NODE_GEN_TERM(NAME, EXPR) \
+    void DOTListener::enter##NAME (CProgramParser::NAME##Context *ctx) { \
+        addAttachNextTerm(EXPR); \
+    } \
+
+
 const string &DOTListener::getName()
 {
     stringstream name;
@@ -40,7 +58,7 @@ void DOTListener::addAttachPush(const string &name, const string &label, Shape n
     pushNode(name);
 }
 
-void DOTListener::addAttachPushNext(const string &label, Shape nodeShape)
+void DOTListener::addAttachPushNext(const string &label, const Shape &nodeShape)
 {
     addAttachPush(getName(), label, nodeShape);
 }
@@ -51,7 +69,7 @@ void DOTListener::addAttachTerm(const string &name, const string &label, Shape n
     attachNode(name);
 }
 
-void DOTListener::addAttachNextTerm(const string &label, Shape nodeShape)
+void DOTListener::addAttachNextTerm(const string &label, const Shape &nodeShape)
 {
     addAttachTerm(getName(), label, nodeShape);
 }
@@ -144,50 +162,44 @@ void DOTListener::enterIncludeFile(CProgramParser::IncludeFileContext *ctx)
     addAttachNextTerm(label.str(), Shape::Box);
 }
 
-void DOTListener::enterMacroArgList(CProgramParser::MacroArgListContext *ctx)
-{
-    addAttachPushNext("Macro args", Shape::Box);
+NODE_GEN_NONTERM(MacroArgList, "ARGS")
+
+NODE_GEN_NONTERM(Statement, "S")
+
+NODE_GEN_NONTERM(ElseStmt, "ELSE")
+
+NODE_GEN_NONTERM(IfStmt, "IF")
+
+NODE_GEN_NONTERM(ForLoop, "FOR")
+
+NODE_GEN_NONTERM(WhileLoop, "WHILE")
+
+NODE_GEN_NONTERM(Declaration, "DECL")
+
+NODE_GEN_TERM(SimpleName, ctx->getText())
+
+NODE_GEN_NONTERM(ArrName, "[]")
+
+NODE_GEN_NONTERM(SingleDef, "=")
+
+NODE_GEN_NONTERM(MultDecl, ",")
+
+void DOTListener::enterMultDef(CProgramParser::MultDefContext *ctx) {
+    addAttachPushNext(",");
+    addAttachPushNext("=");
 }
 
-void DOTListener::exitMacroArgList(CProgramParser::MacroArgListContext *ctx) { pop(); }
-
-void DOTListener::enterStatement(CProgramParser::StatementContext *ctx)
-{
-    addAttachPushNext("S", Shape::Box);
+void DOTListener::exitMultDef(CProgramParser::MultDefContext *ctx) {
+    pop();
+    pop();
 }
 
-void DOTListener::exitStatement(CProgramParser::StatementContext *ctx) { pop(); }
+NODE_GEN_NONTERM(FnDeclaration, "FN")
 
-void DOTListener::enterElseStmt(CProgramParser::ElseStmtContext *ctx) {
-    addAttachPushNext("Else", Shape::Box);
-}
+NODE_GEN_NONTERM(FnImplementation, "FN")
 
-void DOTListener::exitElseStmt(CProgramParser::ElseStmtContext *ctx) { pop(); }
+NODE_GEN_NONTERM(TypeDefinition, "TYPE")
 
-void DOTListener::enterIfStmt(CProgramParser::IfStmtContext *ctx) {
-    addAttachPushNext("If", Shape::Box);
-}
+NODE_GEN_NONTERM(ArgDeclList, "ARGS")
 
-void DOTListener::exitIfStmt(CProgramParser::IfStmtContext *ctx) { pop(); }
-
-void DOTListener::enterForLoop(CProgramParser::ForLoopContext *ctx) {
-    addAttachPushNext("For", Shape::Box);
-}
-
-void DOTListener::exitForLoop(CProgramParser::ForLoopContext *ctx) { pop(); }
-
-void DOTListener::enterWhileLoop(CProgramParser::WhileLoopContext *ctx) {
-    addAttachPushNext("While", Shape::Box);
-}
-
-void DOTListener::exitWhileLoop(CProgramParser::WhileLoopContext *ctx) { pop(); }
-
-void DOTListener::enterDeclaration(CProgramParser::DeclarationContext *ctx) {
-    addAttachPushNext("Declaration", Shape::Box);
-}
-
-void DOTListener::exitDeclaration(CProgramParser::DeclarationContext *ctx) { pop(); }
-
-void DOTListener::enterVarName(CProgramParser::VarNameContext *ctx) {
-    addAttachNextTerm(ctx->getText(), Shape::Box);
-}
+NODE_GEN_NONTERM(Block, "{ ... }")

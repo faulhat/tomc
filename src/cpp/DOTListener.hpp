@@ -11,6 +11,17 @@
 using namespace std;
 using namespace antlr4;
 
+// Creates a declaration for the enter method for a given node type in the AST
+#define ENTER(NAME) \
+    void enter##NAME (CProgramParser::NAME##Context *ctx) override; \
+
+
+// Creates a declaration for the exit method as well
+#define ENTER_EXIT(NAME) \
+    void enter##NAME (CProgramParser::NAME##Context *ctx) override; \
+    void exit##NAME (CProgramParser::NAME##Context *ctx) override; \
+
+
 // Generally, the Box shape should be used for special constructions.
 // Atoms and variable, function, and type names should use the Blob shape.
 enum class Shape {
@@ -52,13 +63,13 @@ private:
     // Uses getName() for the name parameter automatically.
     // This works fine because the actual node names are only for internal use,
     // and have no bearing on the actual graph.
-    void addAttachPushNext(const string &label, Shape nodeShape);
+    void addAttachPushNext(const string &label, const Shape &nodeShape = Shape::Box);
 
     // Same as addAttachPush but minus the push, for use with terminal nodes (leaves)
     void addAttachTerm(const string &name, const string &label, Shape nodeShape);
 
     // Automatically uses getName()
-    void addAttachNextTerm(const string &label, Shape nodeShape);
+    void addAttachNextTerm(const string &label, const Shape &nodeShape = Shape::Blob);
 
     // Shorthand for nodeTraceback.pop()
     void pop();
@@ -73,47 +84,55 @@ public:
     // Should automatically create and attach nodes for named tokens
     void visitTerminal(tree::TerminalNode *node) override;
 
-    void enterProgram(CProgramParser::ProgramContext *ctx) override;
-    void exitProgram(CProgramParser::ProgramContext *ctx) override;
+    ENTER_EXIT(Program)
 
-    void enterDefineFlag(CProgramParser::DefineFlagContext *ctx) override;
+    ENTER(DefineFlag)
 
-    void enterDefineConst(CProgramParser::DefineConstContext *ctx) override;
-    void exitDefineConst(CProgramParser::DefineConstContext *ctx) override;
+    ENTER_EXIT(DefineConst)
 
-    void enterDefineMacro(CProgramParser::DefineMacroContext *ctx) override;
-    void exitDefineMacro(CProgramParser::DefineMacroContext *ctx) override;
+    ENTER_EXIT(DefineMacro)
 
-    void enterIfDef(CProgramParser::IfDefContext *ctx) override;
+    ENTER(IfDef)
 
-    void enterIfNotDef(CProgramParser::IfNotDefContext *ctx) override;
+    ENTER(IfNotDef)
 
-    void enterUnDef(CProgramParser::UnDefContext *ctx) override;
+    ENTER(UnDef)
 
-    void enterIncludeFile(CProgramParser::IncludeFileContext *ctx) override;
+    ENTER(IncludeFile)
 
-    void enterMacroArgList(CProgramParser::MacroArgListContext *ctx) override;
-    void exitMacroArgList(CProgramParser::MacroArgListContext *ctx) override;
+    ENTER_EXIT(MacroArgList)
 
-    void enterStatement(CProgramParser::StatementContext *ctx) override;
-    void exitStatement(CProgramParser::StatementContext *ctx) override;
+    ENTER_EXIT(Statement)
 
-    void enterElseStmt(CProgramParser::ElseStmtContext *ctx) override;
-    void exitElseStmt(CProgramParser::ElseStmtContext *ctx) override;
+    ENTER_EXIT(ElseStmt)
 
-    void enterIfStmt(CProgramParser::IfStmtContext *ctx) override;
-    void exitIfStmt(CProgramParser::IfStmtContext *ctx) override;
+    ENTER_EXIT(IfStmt)
 
-    void enterForLoop(CProgramParser::ForLoopContext *ctx) override;
-    void exitForLoop(CProgramParser::ForLoopContext *ctx) override;
+    ENTER_EXIT(ForLoop)
 
-    void enterWhileLoop(CProgramParser::WhileLoopContext *ctx) override;
-    void exitWhileLoop(CProgramParser::WhileLoopContext *ctx) override;
+    ENTER_EXIT(WhileLoop)
 
-    void enterDeclaration(CProgramParser::DeclarationContext *ctx) override;
-    void exitDeclaration(CProgramParser::DeclarationContext *ctx) override;
+    ENTER_EXIT(Declaration)
 
-    void enterVarName(CProgramParser::VarNameContext *ctx) override;
+    ENTER(SimpleName)
+
+    ENTER_EXIT(ArrName)
+
+    ENTER_EXIT(SingleDef)
+
+    ENTER_EXIT(MultDecl)
+
+    ENTER_EXIT(MultDef)
+
+    ENTER_EXIT(FnDeclaration)
+
+    ENTER_EXIT(FnImplementation)
+
+    ENTER_EXIT(TypeDefinition)
+
+    ENTER_EXIT(ArgDeclList)
+
+    ENTER_EXIT(Block)
 };
 
 #endif

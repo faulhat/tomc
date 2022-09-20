@@ -63,8 +63,8 @@ declaration
 // A variable name to be used in a declaration.
 // Note that the brackets in an array declaration can come after the type or the varname.
 varName
-    : Name
-    | varName '[' ']'
+    : Name #simpleName
+    | varName '[' ']' #arrName
     ;
 
 // A comma-separated list of variable declarations and/or definitions
