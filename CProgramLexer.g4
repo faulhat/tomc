@@ -3,12 +3,13 @@ lexer grammar CProgramLexer;
 fragment DIGIT: [0-9] ;
 
 Name: [a-zA-Z_] [a-zA-Z_0-9]* ;
-StringifyToken: '#' [a-zA-Z_] [a-zA-Z_0-9]* ;
-TokenConcat: [a-zA-Z_] [a-zA-Z_0-9]* '##' [a-zA-Z_0-9]+ ;
 Int: ( '0x' | '0b' )? DIGIT+ 'l'? ;
 Float: ( DIGIT+ '.' DIGIT* | '.' DIGIT+ ) 'f'? ;
 String: '"' ( ~'"' | '\\"' ) '"' ;
 Char: '\'' ( ~'\'' | '\\\'' ) '\'' ;
+
+StringifyToken: '#' [a-zA-Z_] [a-zA-Z_0-9]* ;
+TokenConcat: [a-zA-Z_] [a-zA-Z_0-9]* '##' [a-zA-Z_0-9]+ ;
 
 // Keywords
 TYPEDEF: 'typedef' ;
@@ -83,3 +84,7 @@ ENDIF: '#endif' -> pushMode(PREPROC) ;
 mode PREPROC;
 IGNORE: '\\' [ \n\t\r] -> skip ;
 ENDL: ( '\n' | '\r' | EOF ) -> popMode ;
+PRE_String: '"' ( ~'"' | '\\"' ) '"' ;
+PRE_Path_Inc: '<' ( ~'>' | '\\>' ) '>' ;
+PRE_Name: [a-zA-Z_] [a-zA-Z_0-9]* ;
+PRE_Other: .+? ;

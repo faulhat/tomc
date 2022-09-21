@@ -110,14 +110,14 @@ void DOTListener::exitProgram(CProgramParser::ProgramContext *ctx)
 void DOTListener::enterDefineFlag(CProgramParser::DefineFlagContext *ctx)
 {
     stringstream label;
-    label << "#define " << ctx->Name()->getText() << " (flag)";
+    label << "#define " << ctx->PRE_Name()->getText() << " (flag)";
     addAttachNextTerm(label.str(), Shape::Box);
 }
 
 void DOTListener::enterDefineConst(CProgramParser::DefineConstContext *ctx)
 {
     stringstream label;
-    label << "#define " << ctx->Name()->getText() << " (constant)";
+    label << "#define " << ctx->PRE_Name()->getText() << " (constant)";
     addAttachPushNext(label.str(), Shape::Box);
 }
 
@@ -126,7 +126,7 @@ void DOTListener::exitDefineConst(CProgramParser::DefineConstContext *ctx) { pop
 void DOTListener::enterDefineMacro(CProgramParser::DefineMacroContext *ctx)
 {
     stringstream label;
-    label << "#define " << ctx->Name()->getText() << " (macro)";
+    label << "#define " << ctx->PRE_Name()->getText() << " (macro)";
     addAttachPushNext(label.str(), Shape::Box);
 }
 
@@ -135,28 +135,28 @@ void DOTListener::exitDefineMacro(CProgramParser::DefineMacroContext *ctx) { pop
 void DOTListener::enterIfDef(CProgramParser::IfDefContext *ctx)
 {
     stringstream label;
-    label << "#ifdef " << ctx->Name()->getText();
+    label << "#ifdef " << ctx->PRE_Name()->getText();
     addAttachPushNext(label.str(), Shape::Box);
 }
 
 void DOTListener::enterIfNotDef(CProgramParser::IfNotDefContext *ctx)
 {
     stringstream label;
-    label << "#ifndef " << ctx->Name()->getText();
+    label << "#ifndef " << ctx->PRE_Name()->getText();
     addAttachPushNext(label.str(), Shape::Box);
 }
 
 void DOTListener::enterUnDef(CProgramParser::UnDefContext *ctx)
 {
     stringstream label;
-    label << "#undef " << ctx->Name()->getText();
+    label << "#undef " << ctx->PRE_Name()->getText();
     addAttachNextTerm(label.str(), Shape::Box);
 }
 
 void DOTListener::enterIncludeFile(CProgramParser::IncludeFileContext *ctx)
 {
     stringstream label;
-    label << "#include " << ctx->String()->getText();
+    label << "#include " << ctx->PRE_String()->getText();
     addAttachNextTerm(label.str(), Shape::Box);
 }
 
@@ -170,18 +170,6 @@ NODE_GEN_NONTERM(WhileLoop, "WHILE")
 NODE_GEN_NONTERM(Declaration, "DECL")
 NODE_GEN_TERM(SimpleName, ctx->getText())
 NODE_GEN_NONTERM(ArrName, "[]")
-NODE_GEN_NONTERM(SingleDef, "=")
-NODE_GEN_NONTERM(MultDecl, ",")
-
-void DOTListener::enterMultDef(CProgramParser::MultDefContext *ctx) {
-    addAttachPushNext(",");
-    addAttachPushNext("=");
-}
-
-void DOTListener::exitMultDef(CProgramParser::MultDefContext *ctx) {
-    pop();
-    pop();
-}
 
 #define NODE_GEN_OP(NAME) NODE_GEN_NONTERM(NAME, ctx->op->getText())
 

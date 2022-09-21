@@ -13,14 +13,16 @@ stmtList
 
 // Preprocessor directives
 // Some expressions are valid in preprocessing but not in actual code.
+// These should be parsed by extracting these expressions and reparsing them.
 preproc
-    : DEFINE Name ENDL #DefineFlag
-    | DEFINE Name expression ENDL #DefineConst
-    | DEFINE Name macroArgList ENDL #DefineMacro
-    | IFDEF Name ENDL #IfDef
-    | IFNDEF Name ENDL #IfNotDef
-    | UNDEF Name ENDL #UnDef
-    | INCLUDE String ENDL #IncludeFile
+    : DEFINE PRE_Name ENDL #DefineFlag
+    | DEFINE PRE_Name PRE_Other ENDL #DefineConst
+    | DEFINE PRE_Name PRE_Other ENDL #DefineMacro
+    | IFDEF PRE_Name ENDL #IfDef
+    | IFNDEF PRE_Name ENDL #IfNotDef
+    | UNDEF PRE_Name ENDL #UnDef
+    | INCLUDE PRE_String ENDL #IncludeFile
+    | INCLUDE PRE_Path_Inc ENDL #IncludeFromPath
     | ENDIF ENDL #EndIf
     ;
 
@@ -29,10 +31,7 @@ macroArgList
     ;
 
 statement
-    : SEMI #Empty
-    | expression SEMI #EvalExpr
-    | RETURN expression SEMI #ReturnExpr
-    | deflist SEMI #NewVars
+    : RETURN expression SEMI #ReturnExpr
     | fnDeclaration #StFnDecl
     | fnImplementation #StFnImpl
     | typeDefinition #StType
@@ -40,6 +39,8 @@ statement
     | ifStmt #StIf
     | forLoop #StFor
     | whileLoop #StWhile
+    | SEMI #Empty
+    | expression SEMI #EvalExpr
     ;
 
 ifStmt
@@ -52,15 +53,11 @@ elseStmt
     ;
 
 forLoop
-    : FOR OPAR ( initDef=deflist | initExpr=expression ) SEMI cond=expression SEMI iter=expression CPAR toDo=statement
+    : FOR OPAR init=expression SEMI cond=expression SEMI iter=expression CPAR toDo=statement
     ;
 
 whileLoop
     : WHILE OPAR expression CPAR statement
-    ;
-
-declaration
-    : type varName
     ;
 
 // A variable name to be used in a declaration.
@@ -70,20 +67,12 @@ varName
     | varName OSQ CSQ #arrName
     ;
 
-// A comma-separated list of variable declarations and/or definitions
-deflist
-    : declaration #SingleDecl
-    | declaration ASSIGN expression #SingleDef
-    | deflist COMMA Name #MultDecl
-    | deflist COMMA Name ASSIGN expression #MultDef
-    ;
-
 fnDeclaration
-    : declaration argDeclList SEMI
+    : type varName argDeclList SEMI
     ;
 
 fnImplementation
-    : declaration argDeclList block
+    : type varName argDeclList block
     ;
 
 // A type alias definition
@@ -93,7 +82,7 @@ typeDefinition
 
 // A list of argument declarations for a function
 argDeclList
-    : OPAR ( ( ( declaration | type ) COMMA )* ( declaration | type ) )? CPAR
+    : OPAR ( ( type varName? COMMA )* type varName? )? CPAR
     ;
 
 // A bracketed list of statements to be executed with its own scope
@@ -126,12 +115,20 @@ expression
     | lval=expression op=( ASSIGN | INCBY | DECBY | MULTBY | DIVBY | MODBY | LSHIFTBY | RSHIFTBY | ANDBY | ORBY | XORBY )
         rval=expression #SetVal
     
+    | type varName EQ expression #Definition
+    | type varName #Declaration
+
+    | fst=expression COMMA snd=expression #CommaSeq
+
     | OPAR expression CPAR #Parenthesized
     | Name #NameAtom
     | Int #IntAtom
     | Float #FloatAtom
     | String #StrAtom
     | Char #CharAtom
+
+    // For use in preprocessor macros
+    // Detect usage outside the preprocessor and throw an error semantically
     | StringifyToken #StringifyTokenSpecial
     | TokenConcat #ConcatTokensSpecial
     ;
