@@ -17,7 +17,6 @@ stmtList
 preproc
     : DEFINE PRE_Name ENDL #DefineFlag
     | DEFINE PRE_Name PRE_Other ENDL #DefineConst
-    | DEFINE PRE_Name PRE_Other ENDL #DefineMacro
     | IFDEF PRE_Name ENDL #IfDef
     | IFNDEF PRE_Name ENDL #IfNotDef
     | UNDEF PRE_Name ENDL #UnDef
@@ -26,21 +25,17 @@ preproc
     | ENDIF ENDL #EndIf
     ;
 
-macroArgList
-    : OPAR ( ( Name COMMA )* Name )? CPAR
-    ;
-
 statement
     : RETURN expression SEMI #ReturnExpr
-    | fnDeclaration #StFnDecl
     | fnImplementation #StFnImpl
+    | fnDeclaration #StFnDecl
     | typeDefinition #StType
     | block #StBlock
     | ifStmt #StIf
     | forLoop #StFor
     | whileLoop #StWhile
-    | SEMI #Empty
     | expression SEMI #EvalExpr
+    | SEMI #Empty
     ;
 
 ifStmt
@@ -63,8 +58,8 @@ whileLoop
 // A variable name to be used in a declaration.
 // Note that the brackets in an array declaration can come after the type or the varname.
 varName
-    : Name #simpleName
-    | varName OSQ CSQ #arrName
+    : varName OSQ CSQ #ArrName
+    | Name #SimpleName
     ;
 
 fnDeclaration
@@ -82,7 +77,7 @@ typeDefinition
 
 // A list of argument declarations for a function
 argDeclList
-    : OPAR ( ( type varName? COMMA )* type varName? )? CPAR
+    : OPAR ( type varName? ( COMMA type varName? )* )? CPAR
     ;
 
 // A bracketed list of statements to be executed with its own scope
@@ -112,11 +107,11 @@ expression
     | left=expression LOJAND right=expression #LojAndOp
     | left=expression LOJOR right=expression #LojOrOp
     | cond=expression WONDER ifTrue=expression COLON ifFalse=expression #TernaryOp
+    
+    | type varName ASSIGN expression #Definition
+    | type varName #Declaration
     | lval=expression op=( ASSIGN | INCBY | DECBY | MULTBY | DIVBY | MODBY | LSHIFTBY | RSHIFTBY | ANDBY | ORBY | XORBY )
         rval=expression #SetVal
-    
-    | type varName EQ expression #Definition
-    | type varName #Declaration
 
     | fst=expression COMMA snd=expression #CommaSeq
 
@@ -135,24 +130,24 @@ expression
 
 // A parenthesized list of expressions to be passed as arguments to a function
 arglist
-    : OPAR ( ( expression COMMA )* expression )? CPAR
+    : OPAR ( expression ( COMMA expression )* )? CPAR
     ;
 
 // An initializer list for an array or struct
 initlist
-    : OCURL ( ( expression COMMA )* expression )? CCURL
+    : OCURL ( expression ( COMMA expression )* )? CCURL
     ;
 
 // Any type identifier
 type
-    : Name #SimpleType
-    | type OSQ CSQ #ArrayType
+    : type CONST #ConstType
     | type STAR #PtrType
+    | type OSQ CSQ #ArrayType
     | CONST type #ConstType
-    | type CONST #ConstType
     | kind=( STRUCT | UNION ) Name? structlist #ComplexType
     | kind=( STRUCT | UNION ) Name #AnonType
     | OPAR STAR type CPAR typelist #FnPtrType
+    | Name #SimpleType
     ;
 
 // A parenthesized, comma-separated list of types

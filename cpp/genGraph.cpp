@@ -3,12 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-    string sample =
-        "#include <stdio.h>\n\n"
-        "int main(int argc, char *argv[])\n"
-        "{\n"
-        "\tprintf(\"Hello, world!\");\n"
-        "}";
+    string sample = "int i = 1;";
 
     istream *stream;
     if (argc > 1) {

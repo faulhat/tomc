@@ -41,7 +41,8 @@ void DOTListener::addNode(const string &name, const string &label, Shape nodeSha
 
 void DOTListener::attachNode(const string &name)
 {
-    output << "\t" << name << " -> " << nodeTraceback.top() << ";\n";
+    if (!nodeTraceback.empty())
+        output << "\t" << name << " -> " << nodeTraceback.top() << ";\n";
 }
 
 void DOTListener::pushNode(const string &nodeName)
@@ -123,15 +124,6 @@ void DOTListener::enterDefineConst(CProgramParser::DefineConstContext *ctx)
 
 void DOTListener::exitDefineConst(CProgramParser::DefineConstContext *ctx) { pop(); }
 
-void DOTListener::enterDefineMacro(CProgramParser::DefineMacroContext *ctx)
-{
-    stringstream label;
-    label << "#define " << ctx->PRE_Name()->getText() << " (macro)";
-    addAttachPushNext(label.str(), Shape::Box);
-}
-
-void DOTListener::exitDefineMacro(CProgramParser::DefineMacroContext *ctx) { pop(); }
-
 void DOTListener::enterIfDef(CProgramParser::IfDefContext *ctx)
 {
     stringstream label;
@@ -160,15 +152,13 @@ void DOTListener::enterIncludeFile(CProgramParser::IncludeFileContext *ctx)
     addAttachNextTerm(label.str(), Shape::Box);
 }
 
-NODE_GEN_NONTERM(MacroArgList, "ARGS")
 NODE_GEN_NONTERM(EvalExpr, "S")
 NODE_GEN_NONTERM(ReturnExpr, "RETURN")
 NODE_GEN_NONTERM(ElseStmt, "ELSE")
 NODE_GEN_NONTERM(IfStmt, "IF")
 NODE_GEN_NONTERM(ForLoop, "FOR")
 NODE_GEN_NONTERM(WhileLoop, "WHILE")
-NODE_GEN_NONTERM(Declaration, "DECL")
-NODE_GEN_TERM(SimpleName, ctx->getText())
+NODE_GEN_NONTERM(SimpleName, "VAR")
 NODE_GEN_NONTERM(ArrName, "[]")
 
 #define NODE_GEN_OP(NAME) NODE_GEN_NONTERM(NAME, ctx->op->getText())
@@ -195,12 +185,13 @@ NODE_GEN_NONTERM(BitOrOp, "|")
 NODE_GEN_NONTERM(LojAndOp, "&&")
 NODE_GEN_NONTERM(LojOrOp, "||")
 NODE_GEN_NONTERM(TernaryOp, "?:")
-NODE_GEN_OP(SetVal)
-
+NODE_GEN_NONTERM(SetVal, "SET")
+NODE_GEN_NONTERM(Declaration, "DECL")
+NODE_GEN_NONTERM(Definition, "DEF")
 NODE_GEN_NONTERM(SimpleType, "TYPE")
-NODE_GEN_NONTERM(ArrayType, "[] TYPE")
 NODE_GEN_NONTERM(PtrType, "* TYPE")
 NODE_GEN_NONTERM(ConstType, "CONST")
 NODE_GEN_NONTERM(ComplexType, ctx->kind->getText())
 NODE_GEN_NONTERM(AnonType, ctx->kind->getText())
 NODE_GEN_NONTERM(FnPtrType, "FN *")
+NODE_GEN_NONTERM(ArrayType, "[] TYPE")
