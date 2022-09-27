@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-    string sample = "int i = 1;";
+    string sample = "char *hello = \"Hello, world!\";";
 
     istream *stream;
     if (argc > 1) {

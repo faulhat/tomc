@@ -2,13 +2,12 @@ lexer grammar CProgramLexer;
 
 fragment DIGIT: [0-9] ;
 
-Name: [a-zA-Z_] [a-zA-Z_0-9]* ;
 Int: ( '0x' | '0b' )? DIGIT+ 'l'? ;
 Float: ( DIGIT+ '.' DIGIT* | '.' DIGIT+ ) 'f'? ;
-String: '"' ( ~'"' | '\\"' ) '"' ;
-Char: '\'' ( ~'\'' | '\\\'' ) '\'' ;
+String: '"' ( ~'"' | '\\"' )*? '"' ;
+Char: '\'' ( ~'\'' | '\\\'' )*? '\'' ;
 
-StringifyToken: '#' [a-zA-Z_] [a-zA-Z_0-9]* ;
+HASH: '#' -> mode(STRINGIFY) ;
 TokenConcat: [a-zA-Z_] [a-zA-Z_0-9]* '##' [a-zA-Z_0-9]+ ;
 
 // Keywords
@@ -74,17 +73,22 @@ COMMENT: '/*' .*? '*/' -> skip ;
 LCOMMENT: '//' .*? ( [\n\r] | EOF ) -> skip ;
 
 WS: [ \n\t\r] -> skip ;
-DEFINE: '#define' -> pushMode(PREPROC) ;
-IFDEF: '#ifdef' -> pushMode(PREPROC) ;
-IFNDEF: '#ifndef' -> pushMode(PREPROC) ;
-UNDEF: '#undef' -> pushMode(PREPROC) ;
-INCLUDE: '#include' -> pushMode(PREPROC) ;
-ENDIF: '#endif' -> pushMode(PREPROC) ;
+DEFINE: '#define' -> mode(PREPROC) ;
+IFDEF: '#ifdef' -> mode(PREPROC) ;
+IFNDEF: '#ifndef' -> mode(PREPROC) ;
+UNDEF: '#undef' -> mode(PREPROC) ;
+INCLUDE: '#include' -> mode(PREPROC) ;
+ENDIF: '#endif' -> mode(PREPROC) ;
+
+Name: [a-zA-Z_] [a-zA-Z_0-9]* ;
 
 mode PREPROC;
-IGNORE: '\\' [ \n\t\r] -> skip ;
-ENDL: ( '\n' | '\r' | EOF ) -> popMode ;
-PRE_String: '"' ( ~'"' | '\\"' ) '"' ;
-PRE_Path_Inc: '<' ( ~'>' | '\\>' ) '>' ;
+IGNORE: ( ' ' | '\t' | '\\' [\n\r] ) -> skip ;
+ENDL: ( '\n' | '\r' | EOF ) -> mode(DEFAULT_MODE) ;
+PRE_String: '"' ( ~'"' | '\\"' )*? '"' ;
+PRE_Path_Inc: '<' ( ~'>' | '\\>' )*? '>' ;
 PRE_Name: [a-zA-Z_] [a-zA-Z_0-9]* ;
 PRE_Other: .+? ;
+
+mode STRINGIFY;
+ArgName: [a-zA-Z_] [a-zA-Z_0-9]* -> mode(DEFAULT_MODE) ;

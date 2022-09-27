@@ -1,4 +1,5 @@
 #include <vector>
+#include <boost/algorithm/string.hpp>
 #include "DOTListener.hpp"
 
 // I don't want to type these every time
@@ -17,6 +18,8 @@
         addAttachNextTerm(EXPR); \
     }
 
+#define NODE_GEN_VERBATIM(NAME) NODE_GEN_TERM(NAME, ctx->getText())
+
 string DOTListener::getName()
 {
     stringstream name;
@@ -31,7 +34,9 @@ void DOTListener::addStatement(const string &statement)
 
 void DOTListener::addNode(const string &name, const string &label, Shape nodeShape)
 {
-    output << "\t" << name << "[ label=\"" << label << "\"";
+    string escLabel(label);
+    boost::replace_all(escLabel, "\"", "\\\"");
+    output << "\t" << name << "[ label=\"" << escLabel << "\"";
     if (nodeShape == Shape::Box) {
         output << ", shape=\"box\"";
     }
@@ -87,11 +92,6 @@ DOTListener::DOTListener()
     : nameNumber(0)
 {}
 
-void DOTListener::visitTerminal(tree::TerminalNode *node)
-{
-    addAttachNextTerm(node->getText(), Shape::Blob);
-}
-
 void DOTListener::enterProgram(CProgramParser::ProgramContext *ctx)
 {
     output << "digraph {\n";
@@ -145,12 +145,8 @@ void DOTListener::enterUnDef(CProgramParser::UnDefContext *ctx)
     addAttachNextTerm(label.str(), Shape::Box);
 }
 
-void DOTListener::enterIncludeFile(CProgramParser::IncludeFileContext *ctx)
-{
-    stringstream label;
-    label << "#include " << ctx->PRE_String()->getText();
-    addAttachNextTerm(label.str(), Shape::Box);
-}
+NODE_GEN_VERBATIM(IncludeFile)
+NODE_GEN_VERBATIM(IncludeFromPath)
 
 NODE_GEN_NONTERM(EvalExpr, "S")
 NODE_GEN_NONTERM(ReturnExpr, "RETURN")
@@ -158,7 +154,7 @@ NODE_GEN_NONTERM(ElseStmt, "ELSE")
 NODE_GEN_NONTERM(IfStmt, "IF")
 NODE_GEN_NONTERM(ForLoop, "FOR")
 NODE_GEN_NONTERM(WhileLoop, "WHILE")
-NODE_GEN_NONTERM(SimpleName, "VAR")
+NODE_GEN_VERBATIM(SimpleName)
 NODE_GEN_NONTERM(ArrName, "[]")
 
 #define NODE_GEN_OP(NAME) NODE_GEN_NONTERM(NAME, ctx->op->getText())
@@ -169,7 +165,7 @@ NODE_GEN_NONTERM(TypeDefinition, "TYPE")
 NODE_GEN_NONTERM(ArgDeclList, "ARGS")
 NODE_GEN_NONTERM(Block, "{ ... }")
 NODE_GEN_OP(SuffixOp)
-NODE_GEN_NONTERM(Call, "()")
+NODE_GEN_NONTERM(Call, "CALL")
 NODE_GEN_NONTERM(Subscript, "[]")
 NODE_GEN_OP(MemberGet)
 NODE_GEN_NONTERM(CompLiteral, "COMPLEX")
@@ -188,10 +184,22 @@ NODE_GEN_NONTERM(TernaryOp, "?:")
 NODE_GEN_NONTERM(SetVal, "SET")
 NODE_GEN_NONTERM(Declaration, "DECL")
 NODE_GEN_NONTERM(Definition, "DEF")
-NODE_GEN_NONTERM(SimpleType, "TYPE")
+
+void DOTListener::enterSimpleType(CProgramParser::SimpleTypeContext *ctx)
+{
+    addAttachPushNext("TYPE");
+    addAttachNextTerm(ctx->getText());
+    pop();
+}
+
 NODE_GEN_NONTERM(PtrType, "* TYPE")
 NODE_GEN_NONTERM(ConstType, "CONST")
 NODE_GEN_NONTERM(ComplexType, ctx->kind->getText())
 NODE_GEN_NONTERM(AnonType, ctx->kind->getText())
 NODE_GEN_NONTERM(FnPtrType, "FN *")
 NODE_GEN_NONTERM(ArrayType, "[] TYPE")
+NODE_GEN_VERBATIM(StrAtom)
+NODE_GEN_VERBATIM(NameAtom)
+NODE_GEN_VERBATIM(IntAtom)
+NODE_GEN_VERBATIM(FloatAtom)
+NODE_GEN_VERBATIM(CharAtom)

@@ -1,0 +1,14 @@
+#include <stdio.h>
+
+void printHelloNTimes(int n)
+{
+    for (int i = 0; i < n; i++) {
+        printf("Hello, world!\n");
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    printHelloNTimes(argc);
+    return 0;
+}

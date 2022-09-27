@@ -124,7 +124,7 @@ expression
 
     // For use in preprocessor macros
     // Detect usage outside the preprocessor and throw an error semantically
-    | StringifyToken #StringifyTokenSpecial
+    | HASH ArgName #StringifyTokenSpecial
     | TokenConcat #ConcatTokensSpecial
     ;
 

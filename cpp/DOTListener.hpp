@@ -78,9 +78,6 @@ public:
 
     DOTListener();
 
-    // Should automatically create and attach nodes for named tokens
-    void visitTerminal(tree::TerminalNode *node) override;
-
     ENTER_EXIT(Program)
     ENTER(DefineFlag)
     ENTER_EXIT(DefineConst)
@@ -88,13 +85,14 @@ public:
     ENTER(IfNotDef)
     ENTER(UnDef)
     ENTER(IncludeFile)
+    ENTER(IncludeFromPath)
     ENTER_EXIT(EvalExpr)
     ENTER_EXIT(ReturnExpr)
     ENTER_EXIT(ElseStmt)
     ENTER_EXIT(IfStmt)
     ENTER_EXIT(ForLoop)
     ENTER_EXIT(WhileLoop)
-    ENTER_EXIT(SimpleName)
+    ENTER(SimpleName)
     ENTER_EXIT(ArrName)
     ENTER_EXIT(FnDeclaration)
     ENTER_EXIT(FnImplementation)
@@ -121,13 +119,19 @@ public:
     ENTER_EXIT(SetVal)
     ENTER_EXIT(Declaration)
     ENTER_EXIT(Definition)
-    ENTER_EXIT(SimpleType)
+    ENTER(SimpleType)
     ENTER_EXIT(PtrType)
     ENTER_EXIT(ConstType)
     ENTER_EXIT(ComplexType)
     ENTER_EXIT(AnonType)
     ENTER_EXIT(FnPtrType)
     ENTER_EXIT(ArrayType)
+
+    ENTER(StrAtom)
+    ENTER(NameAtom)
+    ENTER(IntAtom)
+    ENTER(FloatAtom)
+    ENTER(CharAtom)
 };
 
 #endif
