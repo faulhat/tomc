@@ -148,7 +148,6 @@ void DOTListener::enterUnDef(CProgramParser::UnDefContext *ctx)
 NODE_GEN_VERBATIM(IncludeFile)
 NODE_GEN_VERBATIM(IncludeFromPath)
 
-NODE_GEN_NONTERM(EvalExpr, "S")
 NODE_GEN_NONTERM(ReturnExpr, "RETURN")
 NODE_GEN_NONTERM(ElseStmt, "ELSE")
 NODE_GEN_NONTERM(IfStmt, "IF")

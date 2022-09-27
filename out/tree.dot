@@ -1,0 +1,45 @@
+digraph {
+	rankdir="BT";
+	n0[ label="root", shape="box" ];
+	n1[ label="#include<stdio.h>
+" ];
+	n1 -> n0;
+	n2[ label="FN", shape="box" ];
+	n2 -> n0;
+	n3[ label="TYPE", shape="box" ];
+	n3 -> n2;
+	n4[ label="int" ];
+	n4 -> n3;
+	n5[ label="main" ];
+	n5 -> n2;
+	n6[ label="ARGS", shape="box" ];
+	n6 -> n2;
+	n7[ label="TYPE", shape="box" ];
+	n7 -> n6;
+	n8[ label="int" ];
+	n8 -> n7;
+	n9[ label="argc" ];
+	n9 -> n6;
+	n10[ label="* TYPE", shape="box" ];
+	n10 -> n6;
+	n11[ label="TYPE", shape="box" ];
+	n11 -> n10;
+	n12[ label="char" ];
+	n12 -> n11;
+	n13[ label="[]", shape="box" ];
+	n13 -> n6;
+	n14[ label="argv" ];
+	n14 -> n13;
+	n15[ label="{ ... }", shape="box" ];
+	n15 -> n2;
+	n16[ label="CALL", shape="box" ];
+	n16 -> n15;
+	n17[ label="printf" ];
+	n17 -> n16;
+	n18[ label="\"Hello, world!\"" ];
+	n18 -> n16;
+	n19[ label="RETURN", shape="box" ];
+	n19 -> n15;
+	n20[ label="0" ];
+	n20 -> n19;
+}

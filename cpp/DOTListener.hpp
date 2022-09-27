@@ -86,7 +86,6 @@ public:
     ENTER(UnDef)
     ENTER(IncludeFile)
     ENTER(IncludeFromPath)
-    ENTER_EXIT(EvalExpr)
     ENTER_EXIT(ReturnExpr)
     ENTER_EXIT(ElseStmt)
     ENTER_EXIT(IfStmt)
