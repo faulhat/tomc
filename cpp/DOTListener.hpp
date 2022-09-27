@@ -103,6 +103,7 @@ public:
     ENTER_EXIT(Subscript)
     ENTER_EXIT(MemberGet)
     ENTER_EXIT(CompLiteral)
+    ENTER_EXIT(Sizeof)
     ENTER_EXIT(PrefixOp)
     ENTER_EXIT(CCast)
     ENTER_EXIT(MultOp)

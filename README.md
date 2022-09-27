@@ -17,4 +17,4 @@ dot out/tree.dot -Tpng > out/tree.png
 
 After which `tree.png` should look like this:
 
-![abstract syntax tree](/out/tree.png)
+![abstract syntax tree](/demo/tree.png)

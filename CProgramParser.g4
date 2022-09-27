@@ -87,13 +87,17 @@ block
 
 // Any expression which can be evaluated
 expression
-    : expression op=( INC | DEC ) #SuffixOp
+    : OPAR expression CPAR #Parenthesized
+    | expression op=( INC | DEC ) #SuffixOp
     | expression arglist #Call
     | expression OSQ expression CSQ #Subscript
     | expression op=( DOT | ARROW ) Name #MemberGet
     | OPAR type CPAR initlist #CompLiteral
 
-    | op=( INC | DEC | PLUS | MINUS | LOJNOT | BITNOT | STAR | BITAND | SIZEOF ) expression #PrefixOp
+    | SIZEOF OPAR type CPAR #Sizeof
+    | SIZEOF type #Sizeof
+    | SIZEOF expression #Sizeof
+    | op=( INC | DEC | PLUS | MINUS | LOJNOT | BITNOT | STAR | BITAND ) expression #PrefixOp
     | OPAR type CPAR expression #CCast
 
     | left=expression op=( STAR | DIV | MOD ) right=expression #MultOp
@@ -115,7 +119,6 @@ expression
 
     | fst=expression COMMA snd=expression #CommaSeq
 
-    | OPAR expression CPAR #Parenthesized
     | Name #NameAtom
     | Int #IntAtom
     | Float #FloatAtom

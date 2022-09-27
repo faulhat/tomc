@@ -34,6 +34,7 @@
 bin/
 .antlr/
 antlrOut/
+out/
 
 # CMake
 cmake_install.cmake

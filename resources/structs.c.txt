@@ -1,0 +1,43 @@
+typedef struct {
+    int len;
+    int cap;
+    int *data;
+} intarray_t;
+
+intarray_t *makeArray(int initCap)
+{
+    intarray_t *newArray = (intarray_t *)malloc(sizeof(intarray_t));
+    newArray->len = 0;
+    newArray->cap = initCap;
+    newArray->data = (int *)malloc(sizeof(int) * initCap);
+}
+
+void addNum(intarray_t *dst, int num)
+{
+    if (dst->len + 1 == dst->cap) {
+        dst->cap *= 2;
+        int *newData = (int *)malloc(sizeof(int) * dst->cap);
+        memcpy(newData, dst->data, sizeof(int) * dst->len);
+        free(dst->data);
+        dst->data = newData;
+    }
+
+    dst->data[dst->len] = num;
+    dst->len++;
+}
+
+int *getNum(intarray_t *src, int index)
+{
+    if (index > src->len - 1) {
+        return NULL;
+    }
+
+    return src->data + index;
+}
+
+int main(int argc, char *argv[])
+{
+    intarray_t *myArray = makeArray(10);
+    addNum(myArray, 1);
+    getNum(myArray, 0);
+}

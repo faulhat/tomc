@@ -160,14 +160,37 @@ NODE_GEN_NONTERM(ArrName, "[]")
 
 NODE_GEN_NONTERM(FnDeclaration, "FN")
 NODE_GEN_NONTERM(FnImplementation, "FN")
-NODE_GEN_NONTERM(TypeDefinition, "TYPE")
+
+void DOTListener::enterTypeDefinition(CProgramParser::TypeDefinitionContext *ctx)
+{
+    addAttachPushNext("TYPEDEF");
+}
+
+void DOTListener::exitTypeDefinition(CProgramParser::TypeDefinitionContext *ctx)
+{
+    addAttachNextTerm(ctx->Name()->getText());
+    pop();
+}
+
 NODE_GEN_NONTERM(ArgDeclList, "ARGS")
 NODE_GEN_NONTERM(Block, "{ ... }")
 NODE_GEN_OP(SuffixOp)
 NODE_GEN_NONTERM(Call, "CALL")
 NODE_GEN_NONTERM(Subscript, "[]")
-NODE_GEN_OP(MemberGet)
+
+void DOTListener::enterMemberGet(CProgramParser::MemberGetContext *ctx)
+{
+    addAttachPushNext("->");
+}
+
+void DOTListener::exitMemberGet(CProgramParser::MemberGetContext *ctx)
+{
+    addAttachNextTerm(ctx->Name()->getText());
+    pop();
+}
+
 NODE_GEN_NONTERM(CompLiteral, "COMPLEX")
+NODE_GEN_NONTERM(Sizeof, "SIZEOF")
 NODE_GEN_OP(PrefixOp)
 NODE_GEN_NONTERM(CCast, "CAST")
 NODE_GEN_OP(MultOp)
